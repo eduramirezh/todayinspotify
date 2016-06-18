@@ -24,7 +24,8 @@ def parse_births(birth_section):
     filtered = [s for s in birth_section.children if s.__class__.__name__ != 'NavigableString']
     results = []
     for fact in filtered:
-        extract_birth_artist(fact)
+        artist = extract_birth_artist(fact)
+        results.append(artist)
 
 def extract_birth_artist(fact):
     html_content = str(fact).split(':')[1]
@@ -35,7 +36,11 @@ def extract_birth_artist(fact):
         artist_name = fact.select('a')[0].text
     else:
         artist_name = fact.text.split(':')[1]
-    return artist_name
+    return verify_in_spotify(artist_name, 'artist')
+
+def verify_in_spotify(name, content_type):
+    spotify = get_auth_spotify()
+    return spotify.search(name, 1, 0, content_type)
 
 def main():
     added = []
